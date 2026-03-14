@@ -274,7 +274,7 @@
     <div class="container">
         <header>
             <h1>QuickBooks Donor Search</h1>
-            <p>Search donors by name or email address</p>
+            <p>Search donors by name, email, phone number, or customer ID</p>
         </header>
 
         <div class="search-box">
@@ -282,7 +282,7 @@
                 <input
                     type="text"
                     id="searchInput"
-                    placeholder="Enter donor name or email address..."
+                    placeholder="Enter name, email, phone, or customer ID..."
                     autocomplete="off"
                 >
                 <button onclick="search()">Search</button>
@@ -335,7 +335,7 @@
                     resultsDiv.innerHTML = `
                         <div class="no-results">
                             <h2>No results found</h2>
-                            <p>Try searching with a different name or email address</p>
+                            <p>Try searching with a different name, email, or phone number</p>
                         </div>
                     `;
                     return;
@@ -355,6 +355,18 @@
                         </div>
 
                         <div class="customer-details">
+                            ${customer.companyName && customer.companyName !== customer.name ? `
+                            <div class="detail-item">
+                                <div class="detail-label">Company</div>
+                                <div class="detail-value">${customer.companyName}</div>
+                            </div>
+                            ` : ''}
+                            ${customer.givenName || customer.familyName ? `
+                            <div class="detail-item">
+                                <div class="detail-label">Full Name</div>
+                                <div class="detail-value">${customer.givenName} ${customer.familyName}</div>
+                            </div>
+                            ` : ''}
                             <div class="detail-item">
                                 <div class="detail-label">Email</div>
                                 <div class="detail-value">${customer.email}</div>
@@ -363,6 +375,12 @@
                                 <div class="detail-label">Phone</div>
                                 <div class="detail-value">${customer.phone}</div>
                             </div>
+                            ${customer.mobile !== 'N/A' ? `
+                            <div class="detail-item">
+                                <div class="detail-label">Mobile</div>
+                                <div class="detail-value">${customer.mobile}</div>
+                            </div>
+                            ` : ''}
                             <div class="detail-item">
                                 <div class="detail-label">Address</div>
                                 <div class="detail-value">${customer.address}</div>
@@ -375,18 +393,21 @@
 
                         <div class="invoices-section">
                             <div class="invoices-header">
-                                <span>Invoices (${customer.invoiceCount})</span>
+                                <span>Transactions (${customer.transactionCount})</span>
                                 <div class="invoice-stats">
-                                    <span>Total: $${customer.totalInvoiced.toFixed(2)}</span>
+                                    <span>Invoices: ${customer.invoiceCount}</span>
+                                    <span>Sales Receipts: ${customer.salesReceiptCount}</span>
+                                    <span>Total Revenue: $${customer.totalRevenue.toFixed(2)}</span>
                                     <span>Outstanding: $${customer.outstandingBalance.toFixed(2)}</span>
                                 </div>
                             </div>
 
-                            ${customer.invoices.length > 0 ? `
+                            ${customer.transactions.length > 0 ? `
                                 <table class="invoice-table">
                                     <thead>
                                         <tr>
-                                            <th>Invoice #</th>
+                                            <th>Type</th>
+                                            <th>Number</th>
                                             <th>Date</th>
                                             <th>Due Date</th>
                                             <th>Total</th>
@@ -395,23 +416,24 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        ${customer.invoices.map(invoice => `
+                                        ${customer.transactions.map(txn => `
                                             <tr>
-                                                <td><strong>${invoice.docNumber}</strong></td>
-                                                <td>${invoice.date}</td>
-                                                <td>${invoice.dueDate || 'N/A'}</td>
-                                                <td>$${invoice.total.toFixed(2)}</td>
-                                                <td>$${invoice.balance.toFixed(2)}</td>
+                                                <td><strong>${txn.type === 'Invoice' ? '📄 Invoice' : '🧾 Receipt'}</strong></td>
+                                                <td><strong>${txn.docNumber}</strong></td>
+                                                <td>${txn.date}</td>
+                                                <td>${txn.dueDate || 'N/A'}</td>
+                                                <td>$${txn.total.toFixed(2)}</td>
+                                                <td>$${txn.balance.toFixed(2)}</td>
                                                 <td>
-                                                    <span class="status-badge ${invoice.status === 'Paid' ? 'status-paid' : 'status-unpaid'}">
-                                                        ${invoice.status}
+                                                    <span class="status-badge ${txn.status === 'Paid' ? 'status-paid' : 'status-unpaid'}">
+                                                        ${txn.status}
                                                     </span>
                                                 </td>
                                             </tr>
                                         `).join('')}
                                     </tbody>
                                 </table>
-                            ` : '<p style="color: #666;">No invoices found</p>'}
+                            ` : '<p style="color: #666;">No transactions found</p>'}
                         </div>
                     </div>
                 `).join('');

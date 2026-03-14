@@ -1,0 +1,59 @@
+# Dependencies
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Build output (will be built in Docker)
+dist
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Git
+.git
+.gitignore
+.github
+
+# IDE
+.vscode
+.idea
+.DS_Store
+.qodo
+
+# Documentation (except search-app README)
+README.md
+*.md
+!search-app/README.md
+
+# Docker files
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# Azure and deployment scripts
+azure-*.sh
+azure-*.md
+AZURE-*.md
+DEPLOYMENT-*.md
+CREDENTIALS-*.md
+QUICK-START.md
+SECURITY.md
+verify-security.sh
+docker-test-local.sh
+
+# Test files
+test/
+*.test.js
+*.spec.js
+
+# CI/CD
+.github/workflows
+
+# Logs
+logs
+*.log
+
+# OS
+Thumbs.db
