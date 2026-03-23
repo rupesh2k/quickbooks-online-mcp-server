@@ -6,6 +6,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import open from 'open';
+import { tokenManager } from '../helpers/token-manager.js';
 
 dotenv.config();
 
@@ -55,6 +56,18 @@ class QuickbooksClient {
       environment: this.environment,
       redirectUri: this.redirectUri,
     });
+
+    // Initialize token manager with environment tokens (if provided)
+    try {
+      tokenManager.initialize(this.refreshToken, this.realmId);
+      // Use tokens from token manager (it may have more recent ones)
+      this.refreshToken = tokenManager.getRefreshToken();
+      this.realmId = tokenManager.getRealmId();
+      console.log('✓ QuickBooks client initialized with token manager');
+    } catch (error) {
+      // If token manager initialization fails, we'll use OAuth flow when authenticate() is called
+      console.log('Token manager not initialized - will use OAuth flow if needed');
+    }
   }
 
   private async startOAuthFlow(): Promise<void> {
@@ -76,6 +89,16 @@ class QuickbooksClient {
             // Save tokens
             this.refreshToken = tokens.refresh_token;
             this.realmId = tokens.realmId;
+
+            // Update token manager with new tokens
+            tokenManager.updateTokens({
+              refreshToken: tokens.refresh_token,
+              accessToken: tokens.access_token,
+              realmId: tokens.realmId,
+              expiresIn: tokens.expires_in,
+              refreshTokenExpiresIn: (tokens as any).x_refresh_token_expires_in,
+            });
+
             this.saveTokensToEnv();
             
             // Send success response
@@ -185,13 +208,29 @@ class QuickbooksClient {
     try {
       // At this point we know refreshToken is not undefined
       const authResponse = await this.oauthClient.refreshUsingToken(this.refreshToken);
-      
+
       this.accessToken = authResponse.token.access_token;
-      
+
       // Calculate expiry time
       const expiresIn = authResponse.token.expires_in || 3600; // Default to 1 hour
       this.accessTokenExpiry = new Date(Date.now() + expiresIn * 1000);
-      
+
+      // Update token manager with refreshed tokens
+      // Note: refresh_token might be rotated (new one provided)
+      const tokenData = authResponse.token as any;
+      if (tokenData.refresh_token) {
+        this.refreshToken = tokenData.refresh_token;
+      }
+
+      tokenManager.updateTokens({
+        refreshToken: this.refreshToken,
+        accessToken: authResponse.token.access_token,
+        expiresIn: expiresIn,
+        refreshTokenExpiresIn: tokenData.x_refresh_token_expires_in,
+      });
+
+      console.log('✓ Access token refreshed and saved');
+
       return {
         access_token: this.accessToken,
         expires_in: expiresIn,

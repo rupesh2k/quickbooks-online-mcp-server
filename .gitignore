@@ -3,4 +3,5 @@
 node_modules
 dist
 .env
+.qb-tokens.json
 azure-deployment-info.txt
