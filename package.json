@@ -15,16 +15,19 @@
         "watch": "tsc --watch",
         "lint:fix": "eslint --fix",
         "lint": "eslint .",
-        "auth": "node dist/auth-server.js",
-        "search": "node search-app/server.js"
+        "auth": "node auth-server.js",
+        "search": "node search-app/server.js",
+        "assistant": "node qb-assistant/server.js"
     },
     "dependencies": {
+        "@anthropic-ai/sdk": "^0.32.1",
         "@modelcontextprotocol/sdk": "^1.6.0",
         "dotenv": "^16.4.7",
         "express": "^5.2.1",
         "intuit-oauth": "^4.0.0",
         "node-quickbooks": "^2.0.43",
         "open": "^9.1.0",
+        "openai": "^4.73.0",
         "zod": "^3.24.2"
     },
     "devDependencies": {

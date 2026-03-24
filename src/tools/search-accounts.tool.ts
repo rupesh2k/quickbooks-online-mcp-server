@@ -164,16 +164,20 @@ function normalizeAccountCriteria(criteria: any): any {
 }
 
 // Schema exposed to function definition – use broad schema to sidestep $ref errors
-const criteriaSchema = z.any();
+const criteriaSchema = z.any().optional();
 
 const toolSchema = z.object({ criteria: criteriaSchema });
 
 // Tool handler with runtime validation & coercion
 const toolHandler = async ({ params }: any) => {
-  const { criteria } = params;
-  const parsed = RUNTIME_CRITERIA_SCHEMA.safeParse(criteria);
-  if (!parsed.success) {
-    return { content: [{ type: "text" as const, text: `Invalid criteria: ${parsed.error.message}` }] };
+  const { criteria = {} } = params; // Default to empty object if not provided
+
+  // Only validate if criteria is provided
+  if (criteria && Object.keys(criteria).length > 0) {
+    const parsed = RUNTIME_CRITERIA_SCHEMA.safeParse(criteria);
+    if (!parsed.success) {
+      return { content: [{ type: "text" as const, text: `Invalid criteria: ${JSON.stringify(parsed.error.errors, null, 2)}` }] };
+    }
   }
   const normalized = normalizeAccountCriteria(criteria);
   const response = await searchQuickbooksAccounts(normalized);

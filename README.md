@@ -4,10 +4,11 @@ This is a Model Context Protocol (MCP) server implementation for QuickBooks Onli
 
 ## Project Structure
 
-This repository contains two separate applications:
+This repository contains three separate applications:
 
 1. **MCP Server** (`src/`) - Model Context Protocol server for QuickBooks Online integration
 2. **Search Web App** (`search-app/`) - Standalone Express web application for searching customers and invoices
+3. **QB AI Assistant** (`qb-assistant/`) - 🤖 AI-powered conversational interface with safety controls for QuickBooks
 
 ## Setup
 
@@ -80,6 +81,58 @@ npm run search
 
 Then open http://localhost:3000 in your browser. See [search-app/README.md](search-app/README.md) for more details.
 
+### QuickBooks AI Assistant 🤖
+
+An intelligent conversational interface for interacting with QuickBooks through natural language. Supports both **Claude (Anthropic)** and **GPT (OpenAI)**. The AI Assistant provides:
+
+- **Natural Language Interface**: Ask questions in plain English
+- **Safety First**: Always shows action plans and requires confirmation before mutations
+- **Conflict Resolution**: Asks for clarification when multiple matches are found
+- **Single Operations Only**: No bulk operations for safety
+- **Delete Protection**: Delete operations are completely blocked
+- **Flexible AI Provider**: Choose between Anthropic Claude or OpenAI GPT
+
+**Setup:**
+
+1. Choose your AI provider and get an API key:
+   - **Anthropic Claude**: Get key from https://console.anthropic.com/
+   - **OpenAI GPT**: Get key from https://platform.openai.com/api-keys
+
+2. Add to your `.env` file:
+   ```env
+   # For Anthropic (default)
+   AI_PROVIDER=anthropic
+   ANTHROPIC_API_KEY=sk-ant-...
+
+   # OR for OpenAI
+   AI_PROVIDER=openai
+   OPENAI_API_KEY=sk-...
+   ```
+
+3. Run the assistant:
+   ```bash
+   npm run assistant
+   ```
+4. Open http://localhost:3000 in your browser
+
+**Example Usage:**
+```
+You: Show me all customers named John
+Assistant: [Searches and displays results]
+
+You: Create a customer named Acme Corp
+Assistant: **Action Plan:**
+- Operation: create_customer
+- Fields: DisplayName: "Acme Corp"
+
+**Do you want me to proceed? (yes/no)**
+
+You: yes
+Assistant: ✅ Customer created successfully!
+```
+
+See [qb-assistant/README.md](qb-assistant/README.md) for detailed documentation.
+
 ## Available MCP Tools
 
 The MCP server provides tools for Create, Read, Update, Delete, and Search operations for the following QuickBooks entities:
@@ -102,6 +155,7 @@ The MCP server provides tools for Create, Read, Update, Delete, and Search opera
 - `npm run watch` - Watch mode for development
 - `npm run auth` - Run OAuth authentication flow
 - `npm run search` - Start the search web application
+- `npm run assistant` - Start the AI Assistant (requires ANTHROPIC_API_KEY)
 - `npm run lint` - Run ESLint
 - `npm run lint:fix` - Fix ESLint issues
 

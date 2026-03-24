@@ -21,7 +21,7 @@ az containerapp create \
   --name quickbooks-search-app \
   --resource-group quickbooks-search-rg \
   --environment quickbooks-env \
-  --image ghcr.io/rupesh2k/quickbooks-online-mcp-server:v0.0.1 \
+  --image ghcr.io/rupesh2k/quickbooks-online-mcp-server:latest \
   --registry-server ghcr.io \
   --registry-username rupesh2k \
   --registry-password "$GITHUB_TOKEN" \

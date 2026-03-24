@@ -5,3 +5,5 @@ dist
 .env
 .qb-tokens.json
 azure-deployment-info.txt
+.env
+

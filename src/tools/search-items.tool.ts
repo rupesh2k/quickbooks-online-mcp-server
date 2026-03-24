@@ -87,19 +87,21 @@ const RUNTIME_CRITERIA_SCHEMA = z.union([
 ]);
 
 // Exposed schema for OpenAI/JSON – use broad schema to avoid deep $ref issues
-const toolSchema = z.object({ criteria: z.any() });
+const toolSchema = z.object({ criteria: z.any().optional() });
 
 const toolHandler = async ({ params }: any) => {
-  const { criteria } = params;
+  const { criteria = {} } = params; // Default to empty object if not provided
 
-  // Validate against runtime schema
-  const parsed = RUNTIME_CRITERIA_SCHEMA.safeParse(criteria);
-  if (!parsed.success) {
-    return {
-      content: [
-        { type: "text" as const, text: `Invalid criteria: ${parsed.error.message}` },
-      ],
-    };
+  // Validate against runtime schema only if criteria is provided
+  if (criteria && Object.keys(criteria).length > 0) {
+    const parsed = RUNTIME_CRITERIA_SCHEMA.safeParse(criteria);
+    if (!parsed.success) {
+      return {
+        content: [
+          { type: "text" as const, text: `Invalid criteria: ${JSON.stringify(parsed.error.errors, null, 2)}` },
+        ],
+      };
+    }
   }
 
   const response = await searchQuickbooksItems(criteria);
