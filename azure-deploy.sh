@@ -83,8 +83,8 @@ az group create --name $RESOURCE_GROUP --location $LOCATION
 
 # Build Docker image
 echo ""
-echo "Building Docker image..."
-docker build -t $IMAGE_NAME:latest .
+echo "Building Docker image for Linux AMD64..."
+docker build --platform linux/amd64 -t $IMAGE_NAME:latest .
 
 # Tag image for GHCR
 echo "Tagging image for GitHub Container Registry..."
@@ -108,6 +108,7 @@ az container create \
     --resource-group $RESOURCE_GROUP \
     --name $CONTAINER_NAME \
     --image $GHCR_IMAGE:latest \
+    --os-type Linux \
     --cpu 0.5 \
     --memory 0.5 \
     --registry-login-server ghcr.io \

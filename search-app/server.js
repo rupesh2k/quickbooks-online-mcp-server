@@ -280,6 +280,40 @@ app.get('/api/debug/search', async (req, res) => {
   }
 });
 
+// Admin endpoint - Update refresh token
+app.post('/api/admin/update-token', express.json(), async (req, res) => {
+  try {
+    const { refreshToken, realmId } = req.body;
+
+    if (!refreshToken || !realmId) {
+      return res.status(400).json({
+        error: 'Missing required fields: refreshToken and realmId'
+      });
+    }
+
+    // Update token manager with new refresh token
+    const { tokenManager } = await import('../dist/helpers/token-manager.js');
+    tokenManager.updateTokens({
+      refreshToken,
+      realmId,
+    });
+
+    console.log('✓ Refresh token updated via API');
+
+    res.json({
+      success: true,
+      message: 'Refresh token updated successfully',
+      realmId
+    });
+  } catch (error) {
+    console.error('Error updating token:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 // API Test endpoint - validates QuickBooks connectivity
 app.get('/api/test', async (req, res) => {
   const results = [];
