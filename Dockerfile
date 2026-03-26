@@ -37,8 +37,12 @@ RUN npm ci --only=production --ignore-scripts && \
 # Copy built files from builder
 COPY --from=builder /app/dist ./dist
 
-# Copy search-app
+# Copy search-app and assistant
 COPY search-app ./search-app
+COPY qb-assistant ./qb-assistant
+
+# Copy unified server
+COPY unified-server.js ./unified-server.js
 
 # Copy test script for validation
 COPY test-api.js ./test-api.js
@@ -62,5 +66,5 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["dumb-init", "--"]
 
-# Start the search server
-CMD ["node", "search-app/server.js"]
+# Start the unified server
+CMD ["node", "unified-server.js"]

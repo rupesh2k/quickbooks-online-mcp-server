@@ -98,6 +98,21 @@ if [ -z "$QUICKBOOKS_CLIENT_ID" ] || [ -z "$QUICKBOOKS_CLIENT_SECRET" ]; then
     read -p "Enter QUICKBOOKS_ENVIRONMENT (sandbox/production): " QUICKBOOKS_ENVIRONMENT
 fi
 
+# Check for OpenAI API Key (optional)
+if [ -z "$OPENAI_API_KEY" ]; then
+    print_warning "OpenAI API Key not found. AI Assistant will not work without it."
+    echo ""
+    read -p "Enter OPENAI_API_KEY (or press Enter to skip): " OPENAI_API_KEY
+    if [ -z "$OPENAI_API_KEY" ]; then
+        OPENAI_API_KEY="not-set"
+        AI_PROVIDER="openai"
+        OPENAI_MODEL="gpt-4o-mini"
+    fi
+else
+    AI_PROVIDER="${AI_PROVIDER:-openai}"
+    OPENAI_MODEL="${OPENAI_MODEL:-gpt-4o-mini}"
+fi
+
 # Deploy or update container app
 print_info "Checking if container app exists..."
 if az containerapp show --name "$CONTAINER_APP_NAME" --resource-group "$RESOURCE_GROUP" &> /dev/null; then
@@ -125,12 +140,18 @@ else
             quickbooks-client-secret="$QUICKBOOKS_CLIENT_SECRET" \
             quickbooks-refresh-token="$QUICKBOOKS_REFRESH_TOKEN" \
             quickbooks-realm-id="$QUICKBOOKS_REALM_ID" \
+            openai-api-key="$OPENAI_API_KEY" \
+            ai-provider="$AI_PROVIDER" \
+            openai-model="$OPENAI_MODEL" \
         --env-vars \
             QUICKBOOKS_CLIENT_ID=secretref:quickbooks-client-id \
             QUICKBOOKS_CLIENT_SECRET=secretref:quickbooks-client-secret \
             QUICKBOOKS_REFRESH_TOKEN=secretref:quickbooks-refresh-token \
             QUICKBOOKS_REALM_ID=secretref:quickbooks-realm-id \
             QUICKBOOKS_ENVIRONMENT="$QUICKBOOKS_ENVIRONMENT" \
+            OPENAI_API_KEY=secretref:openai-api-key \
+            AI_PROVIDER=secretref:ai-provider \
+            OPENAI_MODEL=secretref:openai-model \
             NODE_ENV=production \
         --output none
 fi

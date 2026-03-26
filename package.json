@@ -15,6 +15,7 @@
         "watch": "tsc --watch",
         "lint:fix": "eslint --fix",
         "lint": "eslint .",
+        "start": "node unified-server.js",
         "auth": "node auth-server.js",
         "search": "node search-app/server.js",
         "assistant": "node qb-assistant/server.js"

@@ -77,6 +77,21 @@ if [ -z "$QUICKBOOKS_CLIENT_ID" ] || [ -z "$QUICKBOOKS_CLIENT_SECRET" ]; then
     exit 1
 fi
 
+# Check for OpenAI API Key (optional but recommended)
+if [ -z "$OPENAI_API_KEY" ]; then
+    echo "Warning: OPENAI_API_KEY not set. AI Assistant will not work."
+    echo "To enable AI Assistant, add to .env: OPENAI_API_KEY=your_key_here"
+    echo "Get your key from: https://platform.openai.com/api-keys"
+    echo ""
+else
+    echo "✓ OpenAI API Key found. AI Assistant will be enabled."
+    echo ""
+fi
+
+# Set default AI provider values if not set
+AI_PROVIDER="${AI_PROVIDER:-openai}"
+OPENAI_MODEL="${OPENAI_MODEL:-gpt-4o-mini}"
+
 # Create resource group
 echo "Creating resource group: $RESOURCE_GROUP in $LOCATION..."
 az group create --name $RESOURCE_GROUP --location $LOCATION
@@ -122,7 +137,11 @@ az container create \
         QUICKBOOKS_REFRESH_TOKEN=$QUICKBOOKS_REFRESH_TOKEN \
         QUICKBOOKS_REALM_ID=$QUICKBOOKS_REALM_ID \
         QUICKBOOKS_ENVIRONMENT=$QUICKBOOKS_ENVIRONMENT \
-        QUICKBOOKS_REDIRECTURI=$QUICKBOOKS_REDIRECTURI
+        QUICKBOOKS_REDIRECTURI=$QUICKBOOKS_REDIRECTURI \
+        OPENAI_API_KEY=$OPENAI_API_KEY \
+        AI_PROVIDER=$AI_PROVIDER \
+        OPENAI_MODEL=$OPENAI_MODEL \
+        NODE_ENV=production
 
 # Get container URL
 CONTAINER_URL=$(az container show \

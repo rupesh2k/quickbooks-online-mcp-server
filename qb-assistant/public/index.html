@@ -502,7 +502,7 @@
         messageInput.focus();
 
         // Check health on load
-        fetch('/api/health')
+        fetch('/api/assistant/health')
             .then(res => res.json())
             .then(data => {
                 console.log('Health check:', data);
