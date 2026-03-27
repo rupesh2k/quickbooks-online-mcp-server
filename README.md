@@ -19,6 +19,7 @@ This fork adds the following capabilities:
 - **🐳 Docker Multi-Stage Builds** - Optimized production images with health checks
 - **🔒 Environment Variable Security** - All secrets managed through environment variables and Azure Key Vault
 
+### 🎥 Demo - https://streamable.com/6bvu3e
 ### 🔄 Syncing with Upstream
 
 To sync with the original Intuit repository:
