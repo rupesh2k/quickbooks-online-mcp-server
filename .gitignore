@@ -1,9 +1,45 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+
+# QuickBooks tokens
+.qb-tokens.json
+
+# Azure deployment info
+azure-deployment-info.txt
+
+# Claude Code local settings
+.claude/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Temporary files
+*.tmp
+*.bak
 .qodo
 
-node_modules
-dist
-.env
-.qb-tokens.json
-azure-deployment-info.txt
-.env
-
+# Git filter-branch backups
+.git-rewrite/
+refs/original/
