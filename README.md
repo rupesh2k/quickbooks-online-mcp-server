@@ -2,6 +2,39 @@
 
 This is a Model Context Protocol (MCP) server implementation for QuickBooks Online integration.
 
+## About This Fork
+
+This repository is a fork of [intuit/quickbooks-online-mcp-server](https://github.com/intuit/quickbooks-online-mcp-server) with additional features and enhancements for production deployment.
+
+### ✨ New Features
+
+This fork adds the following capabilities:
+
+- **🔄 Unified Server** - Single container combining MCP server, OAuth authentication, search UI, and AI assistant
+- **☁️ Azure Container Apps Deployment** - Production-ready deployment scripts with automated CI/CD
+- **🤖 Multi-Provider AI Assistant** - Support for both OpenAI GPT and Anthropic Claude
+- **🔍 Enhanced Customer Search** - Rich search UI with transaction history, invoices, and sales receipts
+- **🔐 Automatic Token Management** - Persistent token storage with automatic refresh
+- **📊 Transaction Analytics** - View customer balances, outstanding invoices, and revenue metrics
+- **🐳 Docker Multi-Stage Builds** - Optimized production images with health checks
+- **🔒 Environment Variable Security** - All secrets managed through environment variables and Azure Key Vault
+
+### 🔄 Syncing with Upstream
+
+To sync with the original Intuit repository:
+
+```bash
+# Add upstream remote (if not already added)
+git remote add upstream https://github.com/intuit/quickbooks-online-mcp-server.git
+
+# Fetch and merge upstream changes
+git fetch upstream
+git merge upstream/main
+
+# Push to your fork
+git push origin main
+```
+
 ## Project Structure
 
 This repository contains three separate applications:
@@ -159,9 +192,34 @@ The MCP server provides tools for Create, Read, Update, Delete, and Search opera
 - `npm run lint` - Run ESLint
 - `npm run lint:fix` - Fix ESLint issues
 
-## Docker Deployment
+## 🚀 Production Deployment
 
-### Quick Start with Docker
+### Unified Server (New!)
+
+This fork includes a unified server (`unified-server.js`) that combines all features into a single container:
+
+- **`/auth`** - OAuth authentication flow
+- **`/search`** - Customer search interface with transactions
+- **`/assistant`** - AI-powered QuickBooks assistant
+
+**Run locally:**
+```bash
+node unified-server.js
+# Access at http://localhost:3000
+```
+
+**Deploy to production:**
+```bash
+# Build unified Docker image
+docker build -t quickbooks-search-app .
+
+# Run with environment file
+docker run -p 3000:3000 --env-file .env quickbooks-search-app
+```
+
+### Docker Deployment
+
+#### Quick Start with Docker
 
 ```bash
 # Build the Docker image
@@ -171,22 +229,35 @@ docker build -t quickbooks-search-app .
 docker run -p 3000:3000 --env-file .env quickbooks-search-app
 ```
 
-### Deploy to Azure Container Apps
+#### Deploy to Azure Container Apps
 
-Use the automated deployment script:
+This fork includes production-ready Azure Container Apps deployment with:
+- Automated scaling (1-3 replicas)
+- Managed secrets via Azure Key Vault
+- GitHub Container Registry integration
+- Health checks and monitoring
 
+**Quick deploy:**
 ```bash
-# Set your image and credentials
-export CONTAINER_IMAGE="ghcr.io/YOUR_USERNAME/quickbooks-online-mcp-server:latest"
+# Set required environment variables
+export GITHUB_TOKEN="your_github_token"
 export QUICKBOOKS_CLIENT_ID="your_client_id"
 export QUICKBOOKS_CLIENT_SECRET="your_client_secret"
-export QUICKBOOKS_REFRESH_TOKEN="your_refresh_token"
 export QUICKBOOKS_REALM_ID="your_realm_id"
-export QUICKBOOKS_ENVIRONMENT="sandbox"
+export QUICKBOOKS_REDIRECTURI="https://your-app.azurecontainerapps.io/callback"
+export OPENAI_API_KEY="your_openai_key"  # Optional for AI assistant
 
 # Deploy to Azure
-./deploy-azure-container.sh
+./deploy-to-azure.sh
 ```
+
+The deployment script will:
+1. Build and push Docker image to GitHub Container Registry
+2. Create Azure Container Apps resources
+3. Configure secrets and environment variables
+4. Deploy the unified server with all features enabled
+
+Access your deployed app at: `https://your-app-name.azurecontainerapps.io`
 
 ### GitHub Container Registry (GHCR)
 
